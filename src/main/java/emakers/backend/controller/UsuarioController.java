@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import emakers.backend.dto.UsuarioDto;
 import emakers.backend.model.Usuario;
 import emakers.backend.service.UsuarioService;
-import jakarta.websocket.server.PathParam;
 import lombok.AllArgsConstructor;
 
 @RestController

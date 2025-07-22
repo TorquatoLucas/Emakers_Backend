@@ -3,9 +3,9 @@ package emakers.backend.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import emakers.backend.model.Usuario;
+import emakers.backend.model.Permissao;
 
 @Repository
-public interface UsuarioRepository extends JpaRepository<Usuario,Integer>{
+public interface PermissaoRepository extends JpaRepository<Permissao,Integer>{
     
 }
