@@ -3,8 +3,11 @@ package emakers.backend.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import emakers.backend.dto.LoginRequest;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -39,7 +42,14 @@ public class Usuario {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @OneToMany(mappedBy = "usuario",fetch = FetchType.LAZY,cascade = CascadeType.ALL,orphanRemoval = true)
-    private Set<Emprestimo> emprestimo = new HashSet<>(); 
+    private Set<Emprestimo> emprestimo = new HashSet<>();
+
+
+
+
+    public boolean loginCorreto(LoginRequest loginRequest, PasswordEncoder passwordEncoder) {
+        return passwordEncoder.matches(loginRequest.senha(), this.senha);
+    } 
 
 
     
