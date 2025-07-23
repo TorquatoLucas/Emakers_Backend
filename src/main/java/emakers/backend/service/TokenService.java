@@ -31,7 +31,7 @@ public class TokenService {
     public LoginResponse login(LoginRequest loginRequest){
         var usuario = usuarioRepository.findByEmail(loginRequest.email());
 
-        if(usuario.isEmpty() || usuario.get().loginCorreto(loginRequest, bCryptPasswordEncoder)){
+        if(usuario.isEmpty() || !usuario.get().loginCorreto(loginRequest, bCryptPasswordEncoder)){
             throw new BadCredentialsException("e-mail ou senha inválidos");
         }
 

@@ -8,4 +8,6 @@ import emakers.backend.model.Permissao;
 @Repository
 public interface PermissaoRepository extends JpaRepository<Permissao,Integer>{
     
+    Permissao findByNome(String nome);
+
 }
