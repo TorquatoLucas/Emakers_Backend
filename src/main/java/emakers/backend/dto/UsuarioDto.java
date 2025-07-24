@@ -2,8 +2,6 @@ package emakers.backend.dto;
 
 
 public record UsuarioDto(
-
-    int id, 
     
     String cpf,
 

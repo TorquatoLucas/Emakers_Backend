@@ -1,5 +1,6 @@
 package emakers.backend.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -15,10 +16,9 @@ import lombok.Setter;
 public class Emprestimo {
 
     @Id
+    @Column(name = "emprestimo_id")
     private int id;
-
-    private String data;
-
+    
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
