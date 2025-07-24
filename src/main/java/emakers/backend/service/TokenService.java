@@ -1,6 +1,8 @@
 package emakers.backend.service;
 
 import java.time.Instant;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import emakers.backend.dto.LoginRequest;
 import emakers.backend.dto.LoginResponse;
+import emakers.backend.model.Permissao;
 import emakers.backend.repository.UsuarioRepository;
 import lombok.AllArgsConstructor;
 
@@ -38,11 +41,17 @@ public class TokenService {
         var agora = Instant.now();
         var expiraEm = 300L;
 
+        var scopes = usuario.get().getPermissoes()
+            .stream()
+            .map(Permissao::getNome)
+            .collect(Collectors.joining(" "));
+
         var claims = JwtClaimsSet.builder()
                 .issuer("emakers")
                 .subject(usuario.get().getId().toString())
                 .issuedAt(agora)
                 .expiresAt(agora.plusSeconds(expiraEm))
+                .claim("scope", scopes)
                 .build();
 
         var jwtValue = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue(); 
