@@ -28,6 +28,7 @@ public class UsuarioController {
 
     @PostMapping
     public ResponseEntity<String> salvarUsuario(@RequestBody UsuarioDto usuarioDto){
+        
         if(usuarioService.salvarUsuario(usuarioDto)){
             return ResponseEntity.status(HttpStatus.CREATED).body("Usuário criado com sucesso");
         }
