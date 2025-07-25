@@ -43,6 +43,7 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_ADM')")
     public ResponseEntity<Usuario> deletarUsuario(@PathVariable Integer id){
         if(usuarioService.deletarUsuario(id)){
             return ResponseEntity.ok().build();

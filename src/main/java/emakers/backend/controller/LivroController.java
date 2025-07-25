@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class LivroController {
     private final LivroService livroService;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('SCOPE_ADM')")
     public ResponseEntity<String> salvarLivro(@RequestBody LivroDto livroDto) {
         
         if(livroService.salvarLivro(livroDto)){
@@ -41,12 +43,14 @@ public class LivroController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_ADM')")
     public ResponseEntity<Livro> atualizarLivro(@PathVariable Integer id, @RequestBody LivroDto livroDto) {
         Livro atualizado = livroService.atualizarLivro(id, livroDto);
         return ResponseEntity.ok(atualizado);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_ADM')")
     public ResponseEntity<Void> deletarLivro(@PathVariable Integer id) {
         livroService.deletarLivro(id);
         return ResponseEntity.noContent().build();
