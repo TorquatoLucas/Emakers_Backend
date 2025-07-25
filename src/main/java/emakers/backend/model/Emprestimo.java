@@ -2,6 +2,8 @@ package emakers.backend.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -16,8 +18,9 @@ import lombok.Setter;
 public class Emprestimo {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "emprestimo_id")
-    private int id;
+    private Integer id;
     
     @ManyToOne
     @JoinColumn(name = "usuario_id")
