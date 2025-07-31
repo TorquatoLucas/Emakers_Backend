@@ -8,6 +8,7 @@ import emakers.backend.dto.LivroDto;
 import emakers.backend.mapper.LivroMapper;
 import emakers.backend.model.Livro;
 import emakers.backend.repository.LivroRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 
 @Service
@@ -30,14 +31,10 @@ public class LivroService {
         return livroRepository.findAll();
     }
 
-    public Livro buscarPorId(int id) {
-        var livro = livroRepository.findById(id);
-
-        if(livro.isPresent()){
-            return livro.get();
-        }
-
-        return null;
+    public Livro buscarPorId(Integer id) {
+        return livroRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Livro com id " + id + " não encontrado."));
+            // FAZER UM GLOBAL EXCEPTION HANDLER DPS
     }
 
     public Livro atualizarLivro(Integer id, LivroDto livroDto) {
@@ -51,7 +48,7 @@ public class LivroService {
         return livroRepository.save(livro);
     }
 
-    public boolean deletarLivro(int id) {
+    public boolean deletarLivro(Integer id) {
         if (livroRepository.existsById(id)) {
             livroRepository.deleteById(id);
             return true;
