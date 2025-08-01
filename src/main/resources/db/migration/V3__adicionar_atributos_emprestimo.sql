@@ -1,0 +1,4 @@
+ALTER TABLE emprestimo
+ADD COLUMN data_devolvido DATE,
+ADD COLUMN prazo_devolucao DATE NOT NULL,
+ADD COLUMN devolvido BOOLEAN NOT NULL DEFAULT FALSE;

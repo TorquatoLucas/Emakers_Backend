@@ -1,5 +1,6 @@
 package emakers.backend.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -38,6 +39,8 @@ public class EmprestimoService {
 
         emprestimo.setUsuario(usuario);
 
+        emprestimo.setPrazoDevolucao(LocalDate.now().plusDays(30));
+
         emprestimoRepository.save(emprestimo);
     }
 
@@ -66,6 +69,10 @@ public class EmprestimoService {
             .findById(emprestimoDto.usuarioId())
             .orElseThrow(() -> new EntityNotFoundException("Usuario com ID " + emprestimoDto.usuarioId() + " não encontrado")));
 
+        emprestimo.setDataDevolvido(emprestimoDto.dataDevolvido());
+        emprestimo.setDevolvido(emprestimoDto.devolvido());
+        emprestimo.setPrazoDevolucao(emprestimoDto.prazoDevolucao());
+
         return emprestimoRepository.save(emprestimo);
     }
 
@@ -76,6 +83,18 @@ public class EmprestimoService {
             return true;
         }
         return false;
+    }
+
+    @Transactional
+    public void devolverLivro(Integer livroId, JwtAuthenticationToken token) {
+        Integer usuarioId = Integer.valueOf(token.getName());
+
+        Emprestimo emprestimo = emprestimoRepository.findByLivroIdAndUsuarioIdAndDevolvidoFalse(livroId, usuarioId)
+            .orElseThrow(() -> new EntityNotFoundException("Empréstimo não encontrado para este livro e usuário."));
+
+        emprestimo.setDevolvido(true);
+        emprestimo.setDataDevolvido(LocalDate.now());
+        emprestimoRepository.save(emprestimo);
     }
 
     

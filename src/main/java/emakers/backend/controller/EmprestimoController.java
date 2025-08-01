@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -27,7 +28,7 @@ public class EmprestimoController {
 
     private final EmprestimoService emprestimoService;
 
-    @PostMapping("/{livroId}")
+    @PostMapping("/livro/{livroId}")
     public ResponseEntity<Void> emprestarLivro(@PathVariable Integer livroId, JwtAuthenticationToken token) {
 
         emprestimoService.emprestarLivro(livroId, token);
@@ -61,6 +62,12 @@ public class EmprestimoController {
             return ResponseEntity.noContent().build(); // 204
         }
         return ResponseEntity.notFound().build(); // 404
+    }
+
+    @PatchMapping("/devolver/livro/{livroId}")
+    public ResponseEntity<Void> devolverLivro(@PathVariable Integer livroId, JwtAuthenticationToken token){
+        emprestimoService.devolverLivro(livroId, token);
+        return ResponseEntity.ok().build();
     }
 
 }

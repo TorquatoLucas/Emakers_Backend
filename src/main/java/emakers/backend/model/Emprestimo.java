@@ -12,6 +12,8 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @Entity
@@ -27,8 +29,17 @@ public class Emprestimo {
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "livro_id")
     private Livro livro;
+
+    @Column(name = "data_devolvido")
+    private LocalDate dataDevolvido;
+
+    @Column(name = "prazo_devolucao", nullable = false)
+    private LocalDate prazoDevolucao;
+
+    @Column(name = "devolvido", nullable = false)
+    private Boolean devolvido = false;
+
 }
