@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,14 +43,18 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.listarUsuarios());
     }
 
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_ADM')") // FAZER VERIFICAÇÃO DPS PARA O PROPRIO USUARIO CONSEGUIR
+    public ResponseEntity<Usuario> atualizarUsuario(@PathVariable Integer id, @RequestBody UsuarioDto UsuarioDto) {
+        Usuario atualizado = usuarioService.atualizarUsuario(id, UsuarioDto);
+        return ResponseEntity.ok(atualizado);
+    }
+
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('SCOPE_ADM')")
-    public ResponseEntity<Usuario> deletarUsuario(@PathVariable Integer id){
-        if(usuarioService.deletarUsuario(id)){
-            return ResponseEntity.ok().build();
-        }else{
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+    @PreAuthorize("hasAuthority('SCOPE_ADM')") // FAZER VERIFICAÇÃO DPS PARA O PROPRIO USUARIO CONSEGUIR
+    public ResponseEntity<Void> deletarUsuario(@PathVariable Integer id) {
+        usuarioService.deletarUsuario(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import emakers.backend.dto.EmprestimoDto;
 import emakers.backend.model.Emprestimo;
@@ -24,6 +25,7 @@ public class EmprestimoService {
 
     private final EmprestimoRepository emprestimoRepository;
 
+    @Transactional
     public void emprestarLivro(Integer livroId,JwtAuthenticationToken token){
 
         Usuario usuario = usuarioRepository.findById(Integer.valueOf(token.getName()))
@@ -39,16 +41,19 @@ public class EmprestimoService {
         emprestimoRepository.save(emprestimo);
     }
 
+    @Transactional(readOnly = true)
     public List<Emprestimo> listarEmprestimos(){
         return emprestimoRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public Emprestimo buscarPorId(Integer id) {
         return emprestimoRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Empréstimo com id " + id + " não encontrado."));
             // FAZER UM GLOBAL EXCEPTION HANDLER DPS
     }
 
+    @Transactional
     public Emprestimo atualizarEmprestimo(Integer id, EmprestimoDto emprestimoDto) {
         Emprestimo emprestimo = emprestimoRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Emprestimo com ID " + id + " não encontrado"));
@@ -64,12 +69,14 @@ public class EmprestimoService {
         return emprestimoRepository.save(emprestimo);
     }
 
-    public void deletarEmprestimo(Integer id) {
-        Emprestimo emprestimo = emprestimoRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Empréstimo com ID " + id + " não encontrado"));
-
-        emprestimoRepository.delete(emprestimo);
+    @Transactional
+    public boolean deletarEmprestimo(Integer id) {
+        if (emprestimoRepository.existsById(id)) {
+            emprestimoRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
-    
 
+    
 }

@@ -48,6 +48,7 @@ public class LivroController {
         Livro atualizado = livroService.atualizarLivro(id, livroDto);
         return ResponseEntity.ok(atualizado);
     }
+    
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADM')")

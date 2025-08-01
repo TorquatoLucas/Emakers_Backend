@@ -1,6 +1,7 @@
 package emakers.backend.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -49,13 +50,31 @@ public class UsuarioService {
     }
 
     @Transactional
-    public boolean deletarUsuario(Integer id){
-        if(usuarioRepository.existsById(id)){
-            usuarioRepository.deleteById(id);
+    public boolean deletarUsuario(Integer id) {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findById(id);
+        if (usuarioOpt.isPresent()) {
+            Usuario usuario = usuarioOpt.get();
+            usuario.getPermissoes().clear(); // Remove os vínculos
+            usuarioRepository.save(usuario); // Atualiza o usuário sem permissões
+            usuarioRepository.delete(usuario); // Agora pode deletar
             return true;
-        }else{
-            return false;
         }
+        return false;
     }
+
+    @Transactional
+    public Usuario atualizarUsuario(Integer id, UsuarioDto usuarioDto) {
+        Usuario usuario = usuarioRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Usuário com ID " + id + " não encontrado"));
+
+        usuario.setCep( usuarioDto.cep() );
+        usuario.setCpf( usuarioDto.cpf() );
+        usuario.setEmail( usuarioDto.email() );
+        usuario.setNome( usuarioDto.nome() );
+        usuario.setSenha(bCryptPasswordEncoder.encode(usuarioDto.senha()));
+
+        return usuarioRepository.save(usuario);
+    }
+
 
 }

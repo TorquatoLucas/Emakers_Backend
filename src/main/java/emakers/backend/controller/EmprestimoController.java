@@ -57,7 +57,10 @@ public class EmprestimoController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADM')")
     public ResponseEntity<Void> deletarEmprestimo(@PathVariable Integer id) {
-        emprestimoService.deletarEmprestimo(id);
-        return ResponseEntity.noContent().build();
+        if (emprestimoService.deletarEmprestimo(id)) {
+            return ResponseEntity.noContent().build(); // 204
+        }
+        return ResponseEntity.notFound().build(); // 404
     }
+
 }

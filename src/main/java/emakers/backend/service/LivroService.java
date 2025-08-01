@@ -3,6 +3,7 @@ package emakers.backend.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import emakers.backend.dto.LivroDto;
 import emakers.backend.mapper.LivroMapper;
@@ -19,6 +20,7 @@ public class LivroService {
 
     private final LivroMapper livroMapper;
 
+    @Transactional
     public Boolean salvarLivro(LivroDto livroDto) {
 
         Livro livro = livroMapper.toLivro(livroDto);
@@ -27,16 +29,19 @@ public class LivroService {
 
     }
 
+    @Transactional(readOnly = true)
     public List<Livro> listaLivros() {
         return livroRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public Livro buscarPorId(Integer id) {
         return livroRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Livro com id " + id + " não encontrado."));
             // FAZER UM GLOBAL EXCEPTION HANDLER DPS
     }
 
+    @Transactional
     public Livro atualizarLivro(Integer id, LivroDto livroDto) {
         Livro livro = livroRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Livro com ID " + id + " não encontrado"));
@@ -48,6 +53,7 @@ public class LivroService {
         return livroRepository.save(livro);
     }
 
+    @Transactional
     public boolean deletarLivro(Integer id) {
         if (livroRepository.existsById(id)) {
             livroRepository.deleteById(id);
