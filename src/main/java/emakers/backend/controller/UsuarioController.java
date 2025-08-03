@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import emakers.backend.dto.UsuarioDto;
+import emakers.backend.dto.UsuarioResponse;
 import emakers.backend.model.Usuario;
 import emakers.backend.service.UsuarioService;
 import lombok.AllArgsConstructor;
@@ -37,9 +38,15 @@ public class UsuarioController {
         
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<UsuarioResponse> buscarPorId(@PathVariable Integer id) {
+        UsuarioResponse usuario = usuarioService.buscarPorId(id);
+        return ResponseEntity.ok(usuario);
+    }
+
     @GetMapping
     @PreAuthorize("hasAuthority('SCOPE_ADM')")
-    public ResponseEntity<List<Usuario>> listarUsuarios(){
+    public ResponseEntity<List<UsuarioResponse>> listarUsuarios(){
         return ResponseEntity.ok(usuarioService.listarUsuarios());
     }
 

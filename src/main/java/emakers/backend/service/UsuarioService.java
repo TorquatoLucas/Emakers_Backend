@@ -1,5 +1,6 @@
 package emakers.backend.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -9,11 +10,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import emakers.backend.dto.UsuarioDto;
+import emakers.backend.dto.UsuarioResponse;
 import emakers.backend.mapper.UsuarioMapper;
 import emakers.backend.model.Permissao;
 import emakers.backend.model.Usuario;
 import emakers.backend.repository.PermissaoRepository;
 import emakers.backend.repository.UsuarioRepository;
+import emakers.backend.viacep.Endereco;
+import emakers.backend.viacep.ViaCep;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 
 @Service
@@ -21,11 +26,14 @@ import lombok.AllArgsConstructor;
 public class UsuarioService {
     
     private final UsuarioRepository usuarioRepository;
+
     private final PermissaoRepository permissaoRepository;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    private UsuarioMapper usuarioMapper;
+    private final UsuarioMapper usuarioMapper;
+
+    private final ViaCep viaCep;
 
     @Transactional
     public Boolean salvarUsuario(UsuarioDto usuarioDto){
@@ -45,9 +53,28 @@ public class UsuarioService {
     }
 
     @Transactional(readOnly = true)
-    public List<Usuario> listarUsuarios(){
-        return usuarioRepository.findAll();
+    public UsuarioResponse buscarPorId(Integer id) {
+        Usuario usuario = usuarioRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Usuário com id " + id + " não encontrado."));
+            // FAZER UM GLOBAL EXCEPTION HANDLER DPS
+
+        return gerarResponse(usuario);
+
     }
+
+
+    @Transactional(readOnly = true)
+    public List<UsuarioResponse> listarUsuarios() {
+        List<Usuario> usuarios = usuarioRepository.findAll();
+        List<UsuarioResponse> respostas = new ArrayList<>();
+
+        for (Usuario usuario : usuarios) {
+            respostas.add(gerarResponse(usuario));
+        }
+
+        return respostas;
+    }
+
 
     @Transactional
     public boolean deletarUsuario(Integer id) {
@@ -77,4 +104,34 @@ public class UsuarioService {
     }
 
 
+
+
+    private UsuarioResponse gerarResponse(Usuario usuario){
+        UsuarioResponse response = new UsuarioResponse(
+                usuario.getCpf(),
+                gerarEndereco(usuario.getCep()),
+                usuario.getNome(),
+                usuario.getEmail(),
+                usuario.getSenha()
+            );
+
+        return response;
+    }
+
+
+    private Endereco gerarEndereco(String cep){
+        Endereco endereco;
+
+        try {
+            endereco = viaCep.gerarEndereco(cep);
+        } catch (Exception e) {
+            endereco = new Endereco(cep, null, null, null, null);
+        }
+
+        if(endereco.cep() == null){
+            return new Endereco(cep, null, null, null, null);
+        }
+
+        return endereco;
+    }
 }
