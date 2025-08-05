@@ -30,19 +30,19 @@ public class EmprestimoController {
 
     @PostMapping("/livro/{livroId}")
     public ResponseEntity<Void> emprestarLivro(@PathVariable Integer livroId, JwtAuthenticationToken token) {
-
         emprestimoService.emprestarLivro(livroId, token);
-
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('SCOPE_ADM')")
     public ResponseEntity<List<Emprestimo>> listarEmprestimos() {
         List<Emprestimo> emprestimos = emprestimoService.listarEmprestimos();
         return ResponseEntity.ok(emprestimos);
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_ADM')")
     public ResponseEntity<Emprestimo> buscarPorId(@PathVariable Integer id) {
         Emprestimo Emprestimo = emprestimoService.buscarPorId(id);
         return ResponseEntity.ok(Emprestimo);
@@ -58,10 +58,7 @@ public class EmprestimoController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADM')")
     public ResponseEntity<Void> deletarEmprestimo(@PathVariable Integer id) {
-        if (emprestimoService.deletarEmprestimo(id)) {
-            return ResponseEntity.noContent().build(); // 204
-        }
-        return ResponseEntity.notFound().build(); // 404
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/devolver/livro/{livroId}")

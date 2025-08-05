@@ -21,13 +21,9 @@ public class LivroController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('SCOPE_ADM')")
-    public ResponseEntity<String> salvarLivro(@RequestBody LivroDto livroDto) {
-        
-        if(livroService.salvarLivro(livroDto)){
-            return ResponseEntity.status(HttpStatus.CREATED).body("Livro criado com sucesso");
-        }
-        return ResponseEntity.status(HttpStatus.CONFLICT).body("Livro já existe");
-
+    public ResponseEntity<Livro> salvarLivro(@RequestBody LivroDto livroDto) {
+        livroService.salvarLivro(livroDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(livroService.salvarLivro(livroDto));
     }
 
     @GetMapping

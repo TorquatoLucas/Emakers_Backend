@@ -34,7 +34,7 @@ public class TokenService {
         var usuario = usuarioRepository.findByEmail(loginRequest.email());
 
         if(usuario.isEmpty() || !usuario.get().loginCorreto(loginRequest, bCryptPasswordEncoder)){
-            throw new BadCredentialsException("e-mail ou senha inválidos");
+            throw new BadCredentialsException(null);
         }
 
         var agora = Instant.now();

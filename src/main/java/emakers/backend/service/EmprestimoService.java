@@ -8,12 +8,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import emakers.backend.dto.EmprestimoDto;
+import emakers.backend.exception.IdNotFoundException;
 import emakers.backend.model.Emprestimo;
 import emakers.backend.model.Usuario;
 import emakers.backend.repository.EmprestimoRepository;
 import emakers.backend.repository.LivroRepository;
 import emakers.backend.repository.UsuarioRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 
 @Service
@@ -30,12 +30,12 @@ public class EmprestimoService {
     public void emprestarLivro(Integer livroId,JwtAuthenticationToken token){
 
         Usuario usuario = usuarioRepository.findById(Integer.valueOf(token.getName()))
-            .orElseThrow(() -> new EntityNotFoundException("Usuario com ID " + token.getName() + " não encontrado"));
+            .orElseThrow(IdNotFoundException::new);
 
         Emprestimo emprestimo = new Emprestimo();
 
         emprestimo.setLivro(livroRepository.findById(livroId)
-            .orElseThrow(() -> new EntityNotFoundException("Livro com ID " + livroId + " não encontrado")));
+            .orElseThrow(IdNotFoundException::new));
 
         emprestimo.setUsuario(usuario);
 
@@ -52,22 +52,21 @@ public class EmprestimoService {
     @Transactional(readOnly = true)
     public Emprestimo buscarPorId(Integer id) {
         return emprestimoRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Empréstimo com id " + id + " não encontrado."));
-            // FAZER UM GLOBAL EXCEPTION HANDLER DPS
+            .orElseThrow(IdNotFoundException::new);
     }
 
     @Transactional
     public Emprestimo atualizarEmprestimo(Integer id, EmprestimoDto emprestimoDto) {
         Emprestimo emprestimo = emprestimoRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Emprestimo com ID " + id + " não encontrado"));
+            .orElseThrow(IdNotFoundException::new);
 
         emprestimo.setLivro(livroRepository
             .findById(emprestimoDto.livroId())
-            .orElseThrow(() -> new EntityNotFoundException("Livro com ID " + emprestimoDto.livroId() + " não encontrado")));
+            .orElseThrow(IdNotFoundException::new));
 
         emprestimo.setUsuario(usuarioRepository
             .findById(emprestimoDto.usuarioId())
-            .orElseThrow(() -> new EntityNotFoundException("Usuario com ID " + emprestimoDto.usuarioId() + " não encontrado")));
+            .orElseThrow(IdNotFoundException::new));
 
         emprestimo.setDataDevolvido(emprestimoDto.dataDevolvido());
         emprestimo.setDevolvido(emprestimoDto.devolvido());
@@ -77,12 +76,12 @@ public class EmprestimoService {
     }
 
     @Transactional
-    public boolean deletarEmprestimo(Integer id) {
+    public void deletarEmprestimo(Integer id) {
         if (emprestimoRepository.existsById(id)) {
             emprestimoRepository.deleteById(id);
-            return true;
+        }else{
+            throw new IdNotFoundException();
         }
-        return false;
     }
 
     @Transactional
@@ -90,10 +89,11 @@ public class EmprestimoService {
         Integer usuarioId = Integer.valueOf(token.getName());
 
         Emprestimo emprestimo = emprestimoRepository.findByLivroIdAndUsuarioIdAndDevolvidoFalse(livroId, usuarioId)
-            .orElseThrow(() -> new EntityNotFoundException("Empréstimo não encontrado para este livro e usuário."));
+            .orElseThrow(IdNotFoundException::new);
 
         emprestimo.setDevolvido(true);
         emprestimo.setDataDevolvido(LocalDate.now());
+        
         emprestimoRepository.save(emprestimo);
     }
 

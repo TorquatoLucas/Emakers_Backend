@@ -6,10 +6,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import emakers.backend.dto.LivroDto;
+import emakers.backend.exception.IdNotFoundException;
 import emakers.backend.mapper.LivroMapper;
 import emakers.backend.model.Livro;
 import emakers.backend.repository.LivroRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 
 @Service
@@ -21,12 +21,9 @@ public class LivroService {
     private final LivroMapper livroMapper;
 
     @Transactional
-    public Boolean salvarLivro(LivroDto livroDto) {
-
+    public Livro salvarLivro(LivroDto livroDto) {
         Livro livro = livroMapper.toLivro(livroDto);
-        livroRepository.save(livro);
-        return true;
-
+        return livroRepository.save(livro);
     }
 
     @Transactional(readOnly = true)
@@ -37,14 +34,13 @@ public class LivroService {
     @Transactional(readOnly = true)
     public Livro buscarPorId(Integer id) {
         return livroRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Livro com id " + id + " não encontrado."));
-            // FAZER UM GLOBAL EXCEPTION HANDLER DPS
+            .orElseThrow(IdNotFoundException::new);
     }
 
     @Transactional
     public Livro atualizarLivro(Integer id, LivroDto livroDto) {
         Livro livro = livroRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Livro com ID " + id + " não encontrado"));
+            .orElseThrow(IdNotFoundException::new);
 
         livro.setAutor( livroDto.autor() );
         livro.setData( livroDto.data() );
@@ -54,11 +50,11 @@ public class LivroService {
     }
 
     @Transactional
-    public boolean deletarLivro(Integer id) {
+    public void deletarLivro(Integer id) {
         if (livroRepository.existsById(id)) {
             livroRepository.deleteById(id);
-            return true;
+        }else{
+            throw new IdNotFoundException();
         }
-        return false;
     }
 }

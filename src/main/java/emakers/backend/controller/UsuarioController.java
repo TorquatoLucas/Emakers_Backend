@@ -29,13 +29,8 @@ public class UsuarioController {
     private final UsuarioService usuarioService;
 
     @PostMapping
-    public ResponseEntity<String> salvarUsuario(@RequestBody UsuarioDto usuarioDto){
-        
-        if(usuarioService.salvarUsuario(usuarioDto)){
-            return ResponseEntity.status(HttpStatus.CREATED).body("Usuário criado com sucesso");
-        }
-        return ResponseEntity.status(HttpStatus.CONFLICT).body("Usuário já existe");
-        
+    public ResponseEntity<Usuario> salvarUsuario(@RequestBody UsuarioDto usuarioDto){
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.salvarUsuario(usuarioDto));
     }
 
     @GetMapping("/{id}")

@@ -11,6 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import emakers.backend.dto.UsuarioDto;
 import emakers.backend.dto.UsuarioResponse;
+import emakers.backend.exception.ConflictException;
+import emakers.backend.exception.IdNotFoundException;
+import emakers.backend.exception.ValidationException;
 import emakers.backend.mapper.UsuarioMapper;
 import emakers.backend.model.Permissao;
 import emakers.backend.model.Usuario;
@@ -18,7 +21,6 @@ import emakers.backend.repository.PermissaoRepository;
 import emakers.backend.repository.UsuarioRepository;
 import emakers.backend.viacep.Endereco;
 import emakers.backend.viacep.ViaCep;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 
 @Service
@@ -36,27 +38,30 @@ public class UsuarioService {
     private final ViaCep viaCep;
 
     @Transactional
-    public Boolean salvarUsuario(UsuarioDto usuarioDto){
+    public Usuario salvarUsuario(UsuarioDto usuarioDto){
 
         var permissaoBasico = permissaoRepository.findByNome(Permissao.Valores.BASICO.name());
 
+        if(usuarioDto.cpf().length() == 11){
+            if(!usuarioRepository.existsByEmail(usuarioDto.email())){
+                Usuario usuario = usuarioMapper.toUsuario(usuarioDto);
+                usuario.setSenha(bCryptPasswordEncoder.encode(usuarioDto.senha()));
+                usuario.setPermissoes(Set.of(permissaoBasico));
+                return usuarioRepository.save(usuario);
+            }
 
-        if(!usuarioRepository.existsByEmail(usuarioDto.email())){
-            Usuario usuario = usuarioMapper.toUsuario(usuarioDto);
-            usuario.setSenha(bCryptPasswordEncoder.encode(usuarioDto.senha()));
-            usuario.setPermissoes(Set.of(permissaoBasico));
-            usuarioRepository.save(usuario);
-            return true;
+            throw new ConflictException();
+        
         }
 
-        return false;
+        throw new ValidationException();
+
     }
 
     @Transactional(readOnly = true)
     public UsuarioResponse buscarPorId(Integer id) {
         Usuario usuario = usuarioRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Usuário com id " + id + " não encontrado."));
-            // FAZER UM GLOBAL EXCEPTION HANDLER DPS
+            .orElseThrow(IdNotFoundException::new);
 
         return gerarResponse(usuario);
 
@@ -77,22 +82,22 @@ public class UsuarioService {
 
 
     @Transactional
-    public boolean deletarUsuario(Integer id) {
+    public void deletarUsuario(Integer id) {
         Optional<Usuario> usuarioOpt = usuarioRepository.findById(id);
         if (usuarioOpt.isPresent()) {
             Usuario usuario = usuarioOpt.get();
-            usuario.getPermissoes().clear(); // Remove os vínculos
-            usuarioRepository.save(usuario); // Atualiza o usuário sem permissões
-            usuarioRepository.delete(usuario); // Agora pode deletar
-            return true;
+            usuario.getPermissoes().clear();
+            usuarioRepository.save(usuario);
+            usuarioRepository.delete(usuario);
+        }else{
+            throw new IdNotFoundException();
         }
-        return false;
     }
 
     @Transactional
     public Usuario atualizarUsuario(Integer id, UsuarioDto usuarioDto) {
         Usuario usuario = usuarioRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Usuário com ID " + id + " não encontrado"));
+            .orElseThrow(IdNotFoundException::new);
 
         usuario.setCep( usuarioDto.cep() );
         usuario.setCpf( usuarioDto.cpf() );
