@@ -19,21 +19,40 @@ import org.springframework.web.bind.annotation.RestController;
 import emakers.backend.dto.EmprestimoDto;
 import emakers.backend.model.Emprestimo;
 import emakers.backend.service.EmprestimoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 
 @RestController
 @AllArgsConstructor
 @RequestMapping("/emprestimo")
+@SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Empréstimo", description = "Operações relacionadas a empréstimos")
 public class EmprestimoController {
 
     private final EmprestimoService emprestimoService;
 
+    @Operation(summary = "Realiza o empréstimo de um livro para o usuário autenticado")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Livro emprestado com sucesso"),
+        @ApiResponse(responseCode = "404", description = "Livro ou Usuário não encontrado")
+    })
     @PostMapping("/livro/{livroId}")
-    public ResponseEntity<Void> emprestarLivro(@PathVariable Integer livroId, JwtAuthenticationToken token) {
+    public ResponseEntity<Void> emprestarLivro(
+            @Parameter(description = "ID do livro a ser emprestado") @PathVariable Integer livroId,
+            JwtAuthenticationToken token) {
         emprestimoService.emprestarLivro(livroId, token);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @Operation(summary = "Lista todos os empréstimos (ADM)")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lista de empréstimos retornada com sucesso")
+    })
     @GetMapping
     @PreAuthorize("hasAuthority('SCOPE_ADM')")
     public ResponseEntity<List<Emprestimo>> listarEmprestimos() {
@@ -41,28 +60,55 @@ public class EmprestimoController {
         return ResponseEntity.ok(emprestimos);
     }
 
+    @Operation(summary = "Busca um empréstimo por ID (ADM)")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Empréstimo encontrado"),
+        @ApiResponse(responseCode = "404", description = "Empréstimo não encontrado")
+    })
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADM')")
-    public ResponseEntity<Emprestimo> buscarPorId(@PathVariable Integer id) {
-        Emprestimo Emprestimo = emprestimoService.buscarPorId(id);
-        return ResponseEntity.ok(Emprestimo);
+    public ResponseEntity<Emprestimo> buscarPorId(
+            @Parameter(description = "ID do empréstimo") @PathVariable Integer id) {
+        Emprestimo emprestimo = emprestimoService.buscarPorId(id);
+        return ResponseEntity.ok(emprestimo);
     }
 
+    @Operation(summary = "Atualiza um empréstimo existente (ADM)")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Empréstimo atualizado com sucesso"),
+        @ApiResponse(responseCode = "404", description = "Empréstimo não encontrado")
+    })
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADM')")
-    public ResponseEntity<Emprestimo> atualizarEmprestimo(@PathVariable Integer id, @RequestBody EmprestimoDto EmprestimoDto) {
-        Emprestimo atualizado = emprestimoService.atualizarEmprestimo(id, EmprestimoDto);
+    public ResponseEntity<Emprestimo> atualizarEmprestimo(
+            @Parameter(description = "ID do empréstimo") @PathVariable Integer id,
+            @RequestBody EmprestimoDto emprestimoDto) {
+        Emprestimo atualizado = emprestimoService.atualizarEmprestimo(id, emprestimoDto);
         return ResponseEntity.ok(atualizado);
     }
 
+    @Operation(summary = "Deleta um empréstimo por ID (ADM)")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Empréstimo deletado com sucesso"),
+        @ApiResponse(responseCode = "404", description = "Empréstimo não encontrado")
+    })
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADM')")
-    public ResponseEntity<Void> deletarEmprestimo(@PathVariable Integer id) {
+    public ResponseEntity<Void> deletarEmprestimo(
+            @Parameter(description = "ID do empréstimo") @PathVariable Integer id) {
+        emprestimoService.deletarEmprestimo(id);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Realiza a devolução de um livro emprestado")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Livro devolvido com sucesso"),
+        @ApiResponse(responseCode = "404", description = "Empréstimo ou livro não encontrado")
+    })
     @PatchMapping("/devolver/livro/{livroId}")
-    public ResponseEntity<Void> devolverLivro(@PathVariable Integer livroId, JwtAuthenticationToken token){
+    public ResponseEntity<Void> devolverLivro(
+            @Parameter(description = "ID do livro a ser devolvido") @PathVariable Integer livroId,
+            JwtAuthenticationToken token) {
         emprestimoService.devolverLivro(livroId, token);
         return ResponseEntity.ok().build();
     }

@@ -41,6 +41,16 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                .requestMatchers(
+                    "/v3/api-docs/**",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html",
+                    "/swagger-ui/index.html",
+                    "/swagger-ui/swagger-ui.css",
+                    "/swagger-ui/swagger-ui-bundle.js",
+                    "/swagger-ui/swagger-ui-standalone-preset.js",
+                    "/swagger-ui/favicon-32x32.png"
+                ).permitAll()
                 .requestMatchers(HttpMethod.POST, "/usuario").permitAll()
                 .anyRequest().authenticated()
             )
