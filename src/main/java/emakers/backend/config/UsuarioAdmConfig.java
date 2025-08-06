@@ -25,7 +25,7 @@ public class UsuarioAdmConfig implements CommandLineRunner{
     @Transactional
     public void run(String... args) throws Exception {
         
-        var permissaoAdm = permissaoRepository.findByNome(Permissao.Valores.ADM.name());
+        var permissaoAdm = permissaoRepository.findByNome(Permissao.Valores.ADMIN.name());
 
         var usuarioAdm = usuarioRepository.findByEmail("adm@adm.com");
 

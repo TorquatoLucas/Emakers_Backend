@@ -42,7 +42,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('SCOPE_ADM')")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     @Operation(
         summary = "Buscar usuário por ID (ADM)",
         description = "Retorna os dados de um usuário específico",
@@ -50,6 +50,7 @@ public class UsuarioController {
     )
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Usuário encontrado"),
+        @ApiResponse(responseCode = "401", description = "Não autenticado"),
         @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
     public ResponseEntity<UsuarioResponse> buscarPorId(
@@ -60,19 +61,20 @@ public class UsuarioController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('SCOPE_ADM')")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     @Operation(
         summary = "Listar todos os usuários (ADM)",
         description = "Retorna uma lista com todos os usuários cadastrados",
         security = @SecurityRequirement(name = "bearerAuth")
     )
     @ApiResponse(responseCode = "200", description = "Lista de usuários retornada com sucesso")
+    @ApiResponse(responseCode = "401", description = "Não autenticado")
     public ResponseEntity<List<UsuarioResponse>> listarUsuarios() {
         return ResponseEntity.ok(usuarioService.listarUsuarios());
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('SCOPE_ADM')")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     @Operation(
         summary = "Atualizar usuário (ADM)",
         description = "Atualiza os dados de um usuário específico",
@@ -81,6 +83,7 @@ public class UsuarioController {
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Usuário atualizado com sucesso"),
         @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+        @ApiResponse(responseCode = "401", description = "Não autenticado"),
         @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
     public ResponseEntity<Usuario> atualizarUsuario(
@@ -92,7 +95,7 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('SCOPE_ADM')")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     @Operation(
         summary = "Deletar usuário (ADM)",
         description = "Remove um usuário do sistema",
@@ -100,6 +103,7 @@ public class UsuarioController {
     )
     @ApiResponses({
         @ApiResponse(responseCode = "204", description = "Usuário deletado com sucesso"),
+        @ApiResponse(responseCode = "401", description = "Não autenticado"),
         @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
     public ResponseEntity<Void> deletarUsuario(

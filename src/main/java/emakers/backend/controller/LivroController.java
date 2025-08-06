@@ -31,10 +31,11 @@ public class LivroController {
     @Operation(summary = "Salva um novo livro (ADM)")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Livro salvo com sucesso"),
-        @ApiResponse(responseCode = "400", description = "Dados inválidos")
+        @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+        @ApiResponse(responseCode = "401", description = "Não autenticado"),
     })
     @PostMapping
-    @PreAuthorize("hasAuthority('SCOPE_ADM')")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<Livro> salvarLivro(
             @RequestBody LivroDto livroDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(livroService.salvarLivro(livroDto));
@@ -42,7 +43,8 @@ public class LivroController {
 
     @Operation(summary = "Lista todos os livros disponíveis")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Lista de livros retornada com sucesso")
+        @ApiResponse(responseCode = "200", description = "Lista de livros retornada com sucesso"),
+        @ApiResponse(responseCode = "401", description = "Não autenticado"),
     })
     @GetMapping
     public ResponseEntity<List<Livro>> listarLivros() {
@@ -53,6 +55,7 @@ public class LivroController {
     @Operation(summary = "Busca um livro por ID")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Livro encontrado"),
+        @ApiResponse(responseCode = "401", description = "Não autenticado"),
         @ApiResponse(responseCode = "404", description = "Livro não encontrado")
     })
     @GetMapping("/{id}")
@@ -65,10 +68,11 @@ public class LivroController {
     @Operation(summary = "Atualiza um livro existente (ADM)")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Livro atualizado com sucesso"),
+        @ApiResponse(responseCode = "401", description = "Não autenticado"),
         @ApiResponse(responseCode = "404", description = "Livro não encontrado")
     })
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('SCOPE_ADM')")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<Livro> atualizarLivro(
             @Parameter(description = "ID do livro") @PathVariable Integer id,
             @RequestBody LivroDto livroDto) {
@@ -79,10 +83,11 @@ public class LivroController {
     @Operation(summary = "Deleta um livro por ID (ADM)")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "Livro deletado com sucesso"),
+        @ApiResponse(responseCode = "401", description = "Não autenticado"),
         @ApiResponse(responseCode = "404", description = "Livro não encontrado")
     })
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('SCOPE_ADM')")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<Void> deletarLivro(
             @Parameter(description = "ID do livro") @PathVariable Integer id) {
         livroService.deletarLivro(id);

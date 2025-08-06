@@ -39,6 +39,7 @@ public class EmprestimoController {
     @Operation(summary = "Realiza o empréstimo de um livro para o usuário autenticado")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Livro emprestado com sucesso"),
+        @ApiResponse(responseCode = "401", description = "Não autenticado"),
         @ApiResponse(responseCode = "404", description = "Livro ou Usuário não encontrado")
     })
     @PostMapping("/livro/{livroId}")
@@ -51,10 +52,11 @@ public class EmprestimoController {
 
     @Operation(summary = "Lista todos os empréstimos (ADM)")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Lista de empréstimos retornada com sucesso")
+        @ApiResponse(responseCode = "200", description = "Lista de empréstimos retornada com sucesso"),
+        @ApiResponse(responseCode = "401", description = "Não autenticado")
     })
     @GetMapping
-    @PreAuthorize("hasAuthority('SCOPE_ADM')")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<List<Emprestimo>> listarEmprestimos() {
         List<Emprestimo> emprestimos = emprestimoService.listarEmprestimos();
         return ResponseEntity.ok(emprestimos);
@@ -63,10 +65,11 @@ public class EmprestimoController {
     @Operation(summary = "Busca um empréstimo por ID (ADM)")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Empréstimo encontrado"),
+        @ApiResponse(responseCode = "401", description = "Não autenticado"),
         @ApiResponse(responseCode = "404", description = "Empréstimo não encontrado")
     })
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('SCOPE_ADM')")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<Emprestimo> buscarPorId(
             @Parameter(description = "ID do empréstimo") @PathVariable Integer id) {
         Emprestimo emprestimo = emprestimoService.buscarPorId(id);
@@ -76,10 +79,11 @@ public class EmprestimoController {
     @Operation(summary = "Atualiza um empréstimo existente (ADM)")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Empréstimo atualizado com sucesso"),
+        @ApiResponse(responseCode = "401", description = "Não autenticado"),
         @ApiResponse(responseCode = "404", description = "Empréstimo não encontrado")
     })
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('SCOPE_ADM')")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<Emprestimo> atualizarEmprestimo(
             @Parameter(description = "ID do empréstimo") @PathVariable Integer id,
             @RequestBody EmprestimoDto emprestimoDto) {
@@ -90,10 +94,11 @@ public class EmprestimoController {
     @Operation(summary = "Deleta um empréstimo por ID (ADM)")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "Empréstimo deletado com sucesso"),
+        @ApiResponse(responseCode = "401", description = "Não autenticado"),
         @ApiResponse(responseCode = "404", description = "Empréstimo não encontrado")
     })
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('SCOPE_ADM')")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<Void> deletarEmprestimo(
             @Parameter(description = "ID do empréstimo") @PathVariable Integer id) {
         emprestimoService.deletarEmprestimo(id);
@@ -103,6 +108,7 @@ public class EmprestimoController {
     @Operation(summary = "Realiza a devolução de um livro emprestado")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Livro devolvido com sucesso"),
+        @ApiResponse(responseCode = "401", description = "Não autenticado"),
         @ApiResponse(responseCode = "404", description = "Empréstimo ou livro não encontrado")
     })
     @PatchMapping("/devolver/livro/{livroId}")

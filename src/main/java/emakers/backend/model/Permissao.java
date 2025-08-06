@@ -21,7 +21,7 @@ public class Permissao {
 
     public enum Valores{
         BASICO(1),
-        ADM(2);
+        ADMIN(2);
 
         Integer permissaoId;
 
